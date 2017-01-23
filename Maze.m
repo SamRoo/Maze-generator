@@ -12,8 +12,9 @@ if mod(dim, 2) == 0
     dim = dim + 1;
 end
 maze = zeros(dim, dim); % the maze walls are 0 values, passages are 1
-row = floor(dim/2);     % start point
-col = floor(dim/2); 
+row = 2;     % start point
+col = 2; 
+maze(2, 1) = 1;
 maze(row,col) = 1;
 f = [];                 % creates the frontier 
 f = updateFrontier(maze, f, row, col); 
@@ -44,7 +45,6 @@ while size(f,2) > 0     % while there is still maze frontier
     f(:,r) = [];            % remove the added cell from frontier
     f = updateFrontier(maze, f, row, col); 
 end
-maze(2, 1) = 1;
 maze(dim-1,dim) = 1;
 imshow(maze,'InitialMagnification','fit'); 
 drawnow;

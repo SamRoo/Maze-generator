@@ -1,17 +1,19 @@
 %{
-Maze generator
-Creates the maze by creating a random spanning tree using a randomised 
-version of Prim's algorithm 
-Animation of generation causes a significant slowdown
+Maze generator -Sam Roo
+Creates a spanning tree using a randomised version of Prim's algorithm 
+Animation of generation causes a significant slowdown but looks fancy
 %}
 
 dim = 0;
 while dim < 3
     dim = input('Enter a maze size (must be greater than 2): ');
 end
-maze = zeros(dim,dim);  % the maze walls are 0 values, passages are 1
-maze(2,1)     = 1;
-row = 2;  col = 2;      % start point
+if mod(dim, 2) == 0
+    dim = dim + 1;
+end
+maze = zeros(dim, dim); % the maze walls are 0 values, passages are 1
+row = floor(dim/2);     % start point
+col = floor(dim/2); 
 maze(row,col) = 1;
 f = [];                 % creates the frontier 
 f = updateFrontier(maze, f, row, col); 
@@ -24,33 +26,34 @@ while size(f,2) > 0     % while there is still maze frontier
         f(:,r) = [];            % removes the it from frontier
         continue;               % skips iteration to choose another cell
     end
-    passages = [];          % create list of cells that the frontier could connect to
-    try if (maze(row-2, col  ) == 1); passages = [passages, [row-2; col  ]];end;catch;end
-    try if (maze(row+2, col  ) == 1); passages = [passages, [row+2; col  ]];end;catch;end
-    try if (maze(row, col - 2) == 1); passages = [passages, [row; col - 2]];end;catch;end
-    try if (maze(row, col + 2) == 1); passages = [passages, [row; col + 2]];end;catch;end
+    v = []; % create list of visited cells that maze(row,col)can connect to
+    if (row-2 > 1)   && (maze(row-2, col) == 1); v = [v, [row-2; col]]; end
+    if (row+2 < dim) && (maze(row+2, col) == 1); v = [v, [row+2; col]]; end
+    if (col-2 > 1)   && (maze(row, col-2) == 1); v = [v, [row; col-2]]; end
+    if (col+2 < dim) && (maze(row, col+2) == 1); v = [v, [row; col+2]]; end
 
-    randPass = randi(size(passages, 2));     % select random passage      
-    vrow = passages(1, randPass);
-    vcol = passages(2, randPass);
-
-    maze((row+vrow)/2, (col+vcol)/2) = 1;    % creates intermediate passage 
-    imshow(maze,'InitialMagnification','fit');   % comment out for speed up
-    maze(row,col) = 1;      % creates passage
-    drawnow;                % comment out for speed up
+    randPass = randi(size(v, 2));      
+    vrow = v(1, randPass);  % selects a random visited cell from v
+    vcol = v(2, randPass);  
+                            % adds cell inbetween frontier cell and visited
+    maze((row+vrow)/2, (col+vcol)/2) = 1;     
+    imshow(maze,'InitialMagnification','fit'); % comment out for speed up
+    maze(row,col) = 1;      % turns frontier cell into a passage
+    drawnow; % comment out for speed up
 
     f(:,r) = [];            % remove the added cell from frontier
     f = updateFrontier(maze, f, row, col); 
 end
-
+maze(2, 1) = 1;
 maze(dim-1,dim) = 1;
 imshow(maze,'InitialMagnification','fit'); 
 drawnow;
 
 function f = updateFrontier(maze, frontier, row, col)
     f = frontier;
-    try if (maze(row-2, col  ) == 0); f = [f, [row-2; col  ]];end;catch;end
-    try if (maze(row+2, col  ) == 0); f = [f, [row+2; col  ]];end;catch;end
-    try if (maze(row, col - 2) == 0); f = [f, [row; col - 2]];end;catch;end
-    try if (maze(row, col + 2) == 0); f = [f, [row; col + 2]];end;catch;end
+    dim = size(maze,1);
+    if (row-2 > 1)   && (maze(row-2, col) == 0); f = [f, [row-2; col]]; end
+    if (row+2 < dim) && (maze(row+2, col) == 0); f = [f, [row+2; col]]; end
+    if (col-2 > 1)   && (maze(row, col-2) == 0); f = [f, [row; col-2]]; end
+    if (col+2 < dim) && (maze(row, col+2) == 0); f = [f, [row; col+2]]; end
 end

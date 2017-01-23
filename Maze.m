@@ -7,7 +7,7 @@ Animation of generation causes a significant slowdown
 
 dim = 0;
 while dim < 3
-    dim = input('Enter a maze size (must be greater than 2) ');
+    dim = input('Enter a maze size (must be greater than 2): ');
 end
 maze = zeros(dim,dim);  % the maze walls are 0 values, passages are 1
 maze(2,1)     = 1;
